@@ -1,0 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ART- Sakura Soul</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Sawarabi+Mincho&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="shortcut icon" href="sakuralogo.png" type="image/x-icon">
+    <style>
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: "Sawarabi Mincho", serif;
+        background-image: url("https://images.pexels.com/photos/31710067/pexels-photo-31710067.jpeg");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        background-attachment: fixed;
+        color: #c493b3;
+      }
+
+      /* Navbar styles */
+      .navbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 30px;
+        background: rgba(255 183 197 / 0.32);
+        box-shadow: 0 2px 16px 4px rgba(255 183 197 / 0.08);
+        backdrop-filter: blur(10px);
+        position: sticky;
+        top: 0;
+        z-index: 1101;
+        font-family: "Merriweather", serif;
+        border-bottom: 3px solid transparent;
+        transition: border-color 0.3s, background 0.3s, box-shadow 0.3s;
+      }
+      .navbar:hover {
+        background: rgba(255 192 207 / 0.49);
+      }
+      .logo-container {
+        display: flex;
+        align-items: center;
+        flex-shrink: 0;
+        margin-right: 20px;
+        cursor: pointer;
+      }
+      .logo {
+        width: 125px;
+        max-height: 65px;
+        object-fit: contain;
+        display: block;
+        transition: transform 0.5s ease-in-out, filter 0.5s ease-in-out;
+      }
+      .logo:hover,
+      .logo:focus {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 9px rgba(255, 183, 197, 0.7));
+        outline: none;
+      }
+      .nav-links {
+        list-style: none;
+        display: flex;
+        gap: 24px;
+        margin: 0;
+        padding: 0;
+        flex-grow: 1;
+        justify-content: flex-end;
+      }
+      .nav-links li a {
+        position: relative;
+        overflow: hidden;
+        text-decoration: none;
+        color: #e28fa5;
+        font-weight: 600;
+        padding: 6px 10px;
+        border-radius: 8px;
+        transition: all 0.3s;
+        background: none;
+      }
+      .nav-links li a::after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 0;
+        height: 3.5px;
+        background: linear-gradient(90deg, #e08a9c 30%, #f9c2cd 90%);
+        transition: width 0.5s cubic-bezier(0.32, 0.65, 0.38, 1.41);
+        border-radius: 3px;
+        z-index: 1;
+      }
+      .nav-links li a:hover::after,
+      .nav-links li a:focus::after {
+        width: 100%;
+      }
+      .nav-links li a.active,
+      .nav-links li a:focus-visible {
+        background: #ffacc1cc;
+        box-shadow: 0 0 8px 2px #ffb7c5aa;
+        color: white;
+        transition: box-shadow 0.6s;
+        outline-offset: 2px;
+      }
+      @media (max-width: 768px) {
+        .navbar {
+          padding: 12px 20px;
+        }
+        .nav-links {
+          position: fixed;
+          top: 64px;
+          right: -100%;
+          height: calc(100vh - 64px);
+          width: 220px;
+          background: #fff4f8f2;
+          flex-direction: column;
+          gap: 20px;
+          padding: 24px 20px;
+          box-shadow: -2px 0 5px rgba(255 183 197 / 0.17);
+          transition: right 0.3s, opacity 0.3s;
+          opacity: 0;
+          z-index: 1100;
+        }
+        .nav-links.open {
+          right: 0;
+          opacity: 1;
+        }
+        .menu-toggle {
+          display: flex;
+        }
+        body.nav-open {
+          overflow: hidden;
+        }
+      }
+      .menu-toggle {
+        cursor: pointer;
+        position: relative;
+        width: 30px;
+        height: 24px;
+        display: none;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+      .menu-toggle span {
+        display: block;
+        height: 4px;
+        background: #e28fa5;
+        border-radius: 2px;
+        transition: all 0.3s ease;
+      }
+      .menu-toggle.open span:nth-child(1) {
+        transform: translateY(10px) rotate(45deg);
+      }
+      .menu-toggle.open span:nth-child(2) {
+        opacity: 0;
+      }
+      .menu-toggle.open span:nth-child(3) {
+        transform: translateY(-10px) rotate(-45deg);
+      }
+      canvas#sakura-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        pointer-events: none;
+        z-index: 999;
+      }
+      .page-title {
+        font-family: "Caveat", cursive;
+        font-size: 3.5rem;
+        color: #a04e83;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 1rem;
+        text-shadow: 1px 1.5px 2px #f08ea1;
+        transition: all 0.5s ease-in-out;
+      }
+      .page-title:hover {
+        font-size: 3.51rem;
+        text-shadow: 1px 1.5px 2px #e4526f;
+        transition: all 0.5s ease-in-out;
+      }
+      .sec-title {
+        font-family: "Caveat", cursive;
+        font-size: 2.8rem;
+        color: #a04e83;
+        font-weight: 800;
+        text-align: center;
+        margin-bottom: 1rem;
+        text-shadow: 1px 1.5px 2px #b08ef0;
+        transition: all 0.5s ease-in-out;
+      }
+      /* ENHANCE art CARD STYLES */
+      .grid-container {
+        display: grid;
+        /* CHANGE #2: Modified this line to enforce 5 columns. */
+        grid-template-columns: repeat(5, 1fr);
+        gap: 30px;
+        padding: 40px;
+        justify-items: center;
+      }
+      .grid-item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      .art-card {
+        position: relative;
+        width: 300px;
+        height: 450px;
+        border-radius: 20px;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+        cursor: pointer;
+      }
+      .art-card:hover {
+        transform: translateY(-8px) scale(1.03);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      }
+      .art-card-bg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: fill;
+        display: block;
+      }
+      .art-card-content {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        z-index: 1;
+      }
+      .art-card-overlay {
+        width: 85%;
+        height: auto;
+        border-radius: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        align-self: center;
+        margin-top: 51px;
+        margin-left: 22px;
+      }
+      .art-card-text {
+        width: 100%;
+        text-align: center;
+        padding: 15px 10px;
+        background-color: rgba(255, 183, 197, 0);
+        color: #9b5391;
+        box-sizing: border-box;
+        font-size: 3.5rem;
+        font-weight: 900;
+        margin-bottom: 8.5rem;
+        text-shadow: 2px 1.5px 2px rgba(236, 56, 212, 0.705);
+        font-family: "Caveat", cursive;
+        transition: all 0.5s ease-in-out;
+      }
+
+      /* Responsive grid adjustments */
+      @media (max-width: 1600px) {
+        .grid-container {
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+      }
+      @media (max-width: 768px) {
+        .grid-container {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      /* NEW MODAL STYLES */
+      .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: none; /* Initially hidden */
+        justify-content: center;
+        align-items: center;
+        z-index: 2000;
+        backdrop-filter: blur(5px);
+        opacity: 0;
+        transition: opacity 0.3s ease-in-out;
+      }
+      .modal-overlay.open {
+        display: flex;
+        opacity: 1;
+      }
+      .modal {
+        background: linear-gradient(
+          135deg,
+          rgba(229, 236, 184, 0.959),
+          rgba(226, 241, 160, 0.95)
+        );
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+        max-width: 800px;
+        width: 90%;
+        padding: 2rem;
+        display: flex;
+        flex-direction: row;
+        gap: 2rem;
+        position: relative;
+        transform: scale(0.9);
+        transition: transform 0.3s ease-in-out;
+      }
+      .modal-overlay.open .modal {
+        transform: scale(1);
+      }
+      .modal-image-container {
+        flex: 1;
+        min-width: 250px;
+        max-width: 400px;
+        border-radius: 15px;
+        overflow: hidden;
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+      }
+      .modal-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+      .modal-content {
+        flex: 2;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .modal-title {
+        font-family: "Caveat", cursive;
+        font-size: 3rem;
+        font-weight: 700;
+        color: #a04e83;
+        margin: 0 0 1rem;
+        position: relative;
+      }
+      .modal-title::after {
+        content: "";
+        display: block;
+        width: 60px;
+        height: 4px;
+        background: #e28fa5;
+        margin-top: 5px;
+        border-radius: 2px;
+      }
+      .modal-description {
+        font-family: "Sawarabi Mincho", serif;
+        color: #5d3550;
+        font-size: 1.4rem;
+        line-height: 1.1;
+      }
+      .modal-close {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        background: #e28fa5;
+        border: none;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        font-size: 1.5rem;
+        color: white;
+        cursor: pointer;
+        transition: transform 0.2s ease-in-out, background-color 0.2s;
+      }
+      .modal-close:hover {
+        background-color: #a04e83;
+        transform: rotate(90deg);
+      }
+
+      @media (max-width: 768px) {
+        .modal {
+          flex-direction: column;
+          align-items: center;
+          padding: 1.5rem;
+        }
+        .modal-image-container {
+          min-width: auto;
+          width: 80%;
+        }
+        .modal-title {
+          text-align: center;
+        }
+        .modal-title::after {
+          margin: 5px auto 0;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <nav class="navbar" role="navigation" aria-label="Primary navigation">
+        <a
+          href="index.html"
+          class="logo-container"
+          aria-label="SAKURA SOUL home"
+        >
+          <img
+            src="sakuralogo.png"
+            alt="Sakura Soul Logo with cherry blossom"
+            class="logo"
+          />
+        </a>
+        <button
+          class="menu-toggle"
+          aria-label="Toggle menu"
+          aria-expanded="false"
+          aria-controls="primary-menu"
+        >
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <ul class="nav-links" id="primary-menu">
+          <li><a href="index.html">Home</a></li>
+          <li><a href="about.html">About Us</a></li>
+          <li><a href="blog.html">Blog</a></li>
+          <li><a href="contact.html">Contact</a></li>
+          <li><a href="gallery.html">Gallery</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <div class="page-title">ART</div>
+      <div class="grid-container">
+        <div class="grid-item">
+          <div class="art-card" data-item="noh">
+            <img
+              src="ART CARD.png"
+              class="art-card-bg"
+              alt="art-card background"
+            />
+            <div class="art-card-content">
+              <a href="#"
+                ><img src="noh.jpeg" class="art-card-overlay" alt="noh-card"
+              /></a>
+              <div class="art-card-text">Noh</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid-item">
+          <div class="art-card" data-item="kabuki">
+            <img
+              src="ART CARD.png"
+              class="art-card-bg"
+              alt="art-card background"
+            />
+            <div class="art-card-content">
+              <a href="#"
+                ><img
+                  src="kabuki.jpeg"
+                  class="art-card-overlay"
+                  alt="kabuki-card"
+              /></a>
+              <div class="art-card-text">Kabuki</div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-item">
+          <div class="art-card" data-item="bunraku">
+            <img
+              src="ART CARD.png"
+              class="art-card-bg"
+              alt="art-card background"
+            />
+            <div class="art-card-content">
+              <a href="#"
+                ><img
+                  src="bunraku.jpeg"
+                  class="art-card-overlay"
+                  alt="bunraku-card"
+              /></a>
+              <div class="art-card-text">Bunraku</div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-item">
+          <div class="art-card" data-item="kyōgen">
+            <img
+              src="ART CARD.png"
+              class="art-card-bg"
+              alt="art-card background"
+            />
+            <div class="art-card-content">
+              <a href="#"
+                ><img
+                  src="data:image/jpeg;base64,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"
+                  class="art-card-overlay"
+                  alt="kyōgen-card"
+              /></a>
+              <div class="art-card-text">Kyōgen</div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-item">
+          <div class="art-card" data-item="ikebana">
+            <img
+              src="ART CARD.png"
+              class="art-card-bg"
+              alt="art-card background"
+            />
+            <div class="art-card-content">
+              <a href="#"
+                ><img
+                  src="ikebana.jpeg"
+                  class="art-card-overlay"
+                  alt="ikebana-card"
+              /></a>
+              <div class="art-card-text">Ikebana</div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-item">
+          <div class="art-card" data-item="shodō">
+            <img
+              src="ART CARD.png"
+              class="art-card-bg"
+              alt="art-card background"
+            />
+            <div class="art-card-content">
+              <a href="#"
+                ><img
+                  src="shodō.jpeg"
+                  class="art-card-overlay"
+                  alt="shodō-card"
+              /></a>
+              <div class="art-card-text">Shodo</div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-item">
+          <div class="art-card" data-item="sadō">
+            <img
+              src="ART CARD.png"
+              class="art-card-bg"
+              alt="art-card background"
+            />
+            <div class="art-card-content">
+              <a href="#"
+                ><img src="sadō.jpeg" class="art-card-overlay" alt="sadō-card"
+              /></a>
+              <div class="art-card-text">Sado</div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-item">
+          <div class="art-card" data-item="origami">
+            <img
+              src="ART CARD.png"
+              class="art-card-bg"
+              alt="art-card background"
+            />
+            <div class="art-card-content">
+              <a href="#"
+                ><img src="origami.jpeg" class="art-card-overlay" alt="origami"
+              /></a>
+              <div class="art-card-text">Origami</div>
+            </div>
+          </div>
+        </div>
+          <div class="grid-item">
+          <div class="art-card" data-item="sumi">
+            <img
+              src="ART CARD.png"
+              class="art-card-bg"
+              alt="art-card background"
+            />
+            <div class="art-card-content">
+              <a href="#"
+                ><img src="sumi.jpeg" class="art-card-overlay" alt="origami"
+              /></a>
+              <div class="art-card-text">Sumi-e </div>
+            </div>
+          </div>
+        </div>
+         <div class="grid-item">
+          <div class="art-card" data-item="bonsai">
+            <img
+              src="ART CARD.png"
+              class="art-card-bg"
+              alt="art-card background"
+            />
+            <div class="art-card-content">
+              <a href="#"
+                ><img src="bonsai.webp" class="art-card-overlay" alt="origami"
+              /></a>
+              <div class="art-card-text">Bonsai</div>
+            </div>
+          </div>
+        </div>
+          <div class="grid-item">
+          <div class="art-card" data-item="pottery">
+            <img
+              src="ART CARD.png"
+              class="art-card-bg"
+              alt="art-card background"
+            />
+            <div class="art-card-content">
+              <a href="#"
+                ><img src="pottery.webp" class="art-card-overlay" alt="pottery"
+              /></a>
+              <div class="art-card-text">Pottery</div>
+            </div>
+          </div>
+        </div>
+             <div class="grid-item">
+          <div class="art-card" data-item="lacquerware">
+            <img
+              src="ART CARD.png"
+              class="art-card-bg"
+              alt="art-card background"
+            />
+            <div class="art-card-content">
+              <a href="#"
+                ><img src="lacquerware.webp" class="art-card-overlay" alt="lacquerware"
+              /></a>
+              <div class="art-card-text">Lacquerware</div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-item">
+          <div class="art-card" data-item="carving">
+            <img
+              src="ART CARD.png"
+              class="art-card-bg"
+              alt="art-card background"
+            />
+            <div class="art-card-content">
+              <a href="#"
+                ><img src="carving.jpeg" class="art-card-overlay" alt="carving"
+              /></a>
+              <div class="art-card-text">Wood Carving</div>
+            </div>
+          </div>
+        </div>  
+         <div class="grid-item">
+          <div class="art-card" data-item="nihonga">
+            <img
+              src="ART CARD.png"
+              class="art-card-bg"
+              alt="art-card background"
+            />
+            <div class="art-card-content">
+              <a href="#"
+                ><img src="nihonga.png" class="art-card-overlay" alt="nihonga "
+              /></a>
+              <div class="art-card-text">Nihonga </div>
+            </div>
+          </div>
+        </div>  
+           <div class="grid-item">
+          <div class="art-card" data-item="koto">
+            <img
+              src="ART CARD.png"
+              class="art-card-bg"
+              alt="art-card background"
+            />
+            <div class="art-card-content">
+              <a href="#"
+                ><img src="koto.png" class="art-card-overlay" alt="koto"
+              /></a>
+              <div class="art-card-text">Koto</div>
+            </div>
+          </div>
+        </div>  
+        
+      </div>
+      <canvas id="sakura-canvas"></canvas>
+    </main>
+
+    <div id="art-modal-overlay" class="modal-overlay">
+      <div class="modal">
+        <button class="modal-close">&times;</button>
+        <div class="modal-image-container">
+          <img id="modal-image" class="modal-image" src="" alt="" />
+        </div>
+        <div class="modal-content">
+          <h2 id="modal-title" class="modal-title"></h2>
+          <p id="modal-description" class="modal-description"></p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Javascript (Navbar & Sakura Petals - UNCHANGED)
+      const menuToggle = document.querySelector(".menu-toggle");
+      const navLinks = document.querySelector(".nav-links");
+      menuToggle.addEventListener("click", () => {
+        const expanded =
+          menuToggle.getAttribute("aria-expanded") === "true" || false;
+        menuToggle.setAttribute("aria-expanded", !expanded);
+        navLinks.classList.toggle("open");
+        menuToggle.classList.toggle("open");
+        document.body.classList.toggle("nav-open");
+      });
+
+      const canvas = document.getElementById("sakura-canvas");
+      const ctx = canvas.getContext("2d");
+
+      function resizeCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resizeCanvas();
+      window.addEventListener("resize", resizeCanvas);
+
+      function Petal() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.r = 2 + Math.random() * 9;
+        this.d = 0.3 + Math.random() * 0.4;
+        this.tilt = Math.random() * Math.PI;
+        this.draw = function () {
+          ctx.save();
+          ctx.translate(this.x, this.y);
+          ctx.rotate(this.tilt);
+          ctx.beginPath();
+          ctx.ellipse(0, 0, this.r * 0.5, this.r, Math.PI / 4, 0, 4 * Math.PI);
+          ctx.fillStyle = "rgba(252, 154, 211, 0.62)";
+          ctx.fill();
+          ctx.restore();
+        };
+        this.update = function () {
+          this.x += Math.sin(this.tilt) * this.d * 2;
+          this.y += this.d;
+          this.tilt += 0.009;
+          if (this.y > canvas.height || this.x > canvas.width || this.x < -35) {
+            this.x = Math.random() * canvas.width;
+            this.y = -35;
+          }
+        };
+      }
+
+      function BurstPiece(x, y, angle, speed) {
+        this.x = x;
+        this.y = y;
+        this.angle = angle;
+        this.speed = speed;
+        this.radius = 2 + Math.random() * 2;
+        this.opacity = 1;
+        this.draw = function () {
+          ctx.save();
+          ctx.beginPath();
+          ctx.fillStyle = `rgba(252, 154, 211, ${this.opacity})`;
+          ctx.shadowColor = "rgba(252, 154, 211, 0.7)";
+          ctx.shadowBlur = 6;
+          ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+          ctx.fill();
+          ctx.restore();
+        };
+        this.update = function () {
+          this.x += Math.cos(this.angle) * this.speed;
+          this.y += Math.sin(this.angle) * this.speed;
+          this.speed *= 0.95;
+          this.radius *= 0.87;
+          this.opacity -= 0.03;
+        };
+        this.isDone = function () {
+          return this.opacity <= 0 || this.radius <= 0;
+        };
+      }
+
+      let petals = [];
+      let burstPieces = [];
+
+      for (let i = 0; i < 40; i++) petals.push(new Petal());
+
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        petals.forEach((p) => {
+          p.draw();
+          p.update();
+        });
+        for (let i = burstPieces.length - 1; i >= 0; i--) {
+          const bp = burstPieces[i];
+          bp.draw();
+          bp.update();
+          if (bp.isDone()) burstPieces.splice(i, 1);
+        }
+        requestAnimationFrame(animate);
+      }
+      animate();
+
+      canvas.addEventListener("click", (e) => {
+        for (let i = petals.length - 1; i >= 0; i--) {
+          let p = petals[i];
+          let dx = e.clientX - p.x;
+          let dy = e.clientY - p.y;
+          let dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < p.r * 1.5) {
+            petals.splice(i, 1);
+            let burstCount = 8 + Math.floor(Math.random() * 8);
+            for (let j = 0; j < burstCount; j++) {
+              let angle = Math.random() * 2 * Math.PI;
+              let speed = 3 + Math.random() * 3;
+              burstPieces.push(new BurstPiece(p.x, p.y, angle, speed));
+            }
+            break;
+          }
+        }
+        for (let i = 0; i < 7; i++) {
+          let p = new Petal();
+          p.x = e.clientX;
+          p.y = e.clientY;
+          petals.push(p);
+        }
+      });
+
+      // NEW JAVASCRIPT FOR THE MODAL
+      document.addEventListener("DOMContentLoaded", () => {
+        const modalOverlay = document.getElementById("art-modal-overlay");
+        const modalTitle = document.getElementById("modal-title");
+        const modalImage = document.getElementById("modal-image");
+        const modalDescription = document.getElementById("modal-description");
+        const modalCloseBtn = document.querySelector(".modal-close");
+        const artCards = document.querySelectorAll(".art-card");
+
+        // CHANGE #3: Added data for the new cards.
+        const artData = {
+          noh: {
+            title: "Noh",
+            image: "noh.jpeg",
+            description:
+              "Japan’s oldest masked theatre, blending slow, elegant movement with music and spirituality to portray legends and emotions. Originating in the 14th century, it has been preserved as UNESCO Intangible Cultural Heritage.Museum:National Noh Theatre (Tokyo)",
+          },
+          kabuki: {
+            title: "Kabuki",
+            image: "kabuki.jpeg",
+            description:
+              " Vibrant stage plays full of dramatic acting, bold makeup, and elaborate costumes that captivate audiences. Developed in the Edo period (1603–1868), it reflects the energy and culture of common people.Museum: Kabuki-za Theatre & Kabuki Gallery (Tokyo). ",
+          },
+          bunraku: {
+            title: "Bunraku",
+            image: "bunraku.jpeg",
+            description:
+              " Master puppeteers bring large dolls to life, narrating epic love and tragedy with music. Born in 17th-century Osaka, it remains one of Japan’s three great classical theatres.Museum: National Bunraku Theatre (Osaka)",
+          },
+          kyōgen: {
+            title: "Kyōgen",
+            image:
+              "data:image/jpeg;base64,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",
+            description:
+              " Light-hearted comedies with witty dialogue, often performed between serious Noh plays to balance moods.Originated in the 14th century and continues as Japan’s longest-running comic tradition.Museum: Kyoto Museum of Performing Arts",
+          },
+          ikebana: {
+            title: "Ikebana",
+            image: "ikebana.jpeg",
+            description:
+              "The art of arranging flowers as a spiritual practice, focusing on harmony, line, and balance.Rooted in Buddhist rituals of the 6th century, it became a refined cultural art in the Muromachi period.",
+          },
+          shodō: {
+            title: "Shodo (Calligraphy)",
+            image: "shodō.jpeg",
+            description:
+              "The 'way of writing' where brush and ink transform characters into art full of rhythm and beauty. Arrived from China in the 6th century and evolved into uniquely Japanese expressive styles.Museum: Shodo Museum (Tokyo).",
+          },
+          sadō: {
+            title: " Sado (Tea Ceremony)",
+            image: " sadō.jpeg",
+            description:
+              "A ritual of serving tea that reflects Zen philosophy, mindfulness, and hospitality.Perfected in the 16th century by Sen no Rikyū, it shaped Japanese culture as “the way of tea.Museum: Urasenke Tea Museum (Kyoto).",
+          },
+          origami: {
+            title: " Origami(Paper Folding)",
+            image: " origami.jpeg",
+            description:
+              " Folding paper into cranes, flowers, and shapes as a symbol of creativity and patience.Originated in the 17th century and became an international symbol of Japanese craft.Museum: Origami Kaikan (Tokyo).",
+          },
+          bonsai: {
+            title: " Bonsai (Miniature Trees)",
+            image: " bonsai.webp",
+            description:
+              "Living sculptures where trees are shaped to reflect landscapes and the harmony of nature.First brought from China, perfected in Japan over centuries as a symbol of patience and discipline.Museum: Omiya Bonsai Art Museum (Saitama).",
+          },
+          pottery: {
+            title: " Pottery & Ceramics",
+            image: " pottery.webp",
+            description:
+              "Handcrafted bowls, cups, and vases treasured for simplicity and rustic beauty.A tradition dating back to the Jōmon period (12,000 years ago), now admired worldwide.Museum: Kyushu Ceramic Museum (Saga).",
+          },
+          lacquerware: {
+            title: " Lacquerware (Urushi)",
+            image: " lacquerware.webp",
+            description:
+              " Shiny red and black objects coated in natural sap, treasured for durability and elegance.– Practiced since prehistoric times, refined in the Edo period into luxury art.Museum: Ishikawa Prefectural Lacquerware Museum (Kanazawa).",
+          },
+           carving: {
+            title: "Wood Carving",
+            image: " carving.jpeg",
+            description:
+              "  Sacred carvings of gods, animals, and patterns decorating temples and shrines.Began in the Asuka period (7th century) with Buddhist influence.Museum: Kamakura Museum of National Treasures.",
+          },
+           nihonga: {
+            title: "Nihonga (Modern Japanese Painting)",
+            image: " nihonga.png",
+            description:
+              " 19th-century style blending traditional Japanese brushwork with Western realism; see at National Museum of Modern Art (Tokyo & Kyoto).",
+          },
+           koto: {
+            title: "Koto  Music",
+            image: " koto.png",
+            description:
+              " A 13-string zither brought from China in the 7th century, now Japan’s national instrument; played at ceremonies, schools, and concerts.",
+          },
+        };
+
+        // Function to open the modal
+        function openModal(itemKey) {
+          const data = artData[itemKey];
+          if (!data) return;
+
+          modalTitle.textContent = data.title;
+          modalImage.src = data.image;
+          modalImage.alt = data.title;
+          modalDescription.textContent = data.description;
+
+          modalOverlay.classList.add("open");
+        }
+
+        // Function to close the modal
+        function closeModal() {
+          modalOverlay.classList.remove("open");
+        }
+
+        // Event listener for all art cards
+        artCards.forEach((card) => {
+          card.addEventListener("click", (event) => {
+            const clickedCard = event.target.closest(".art-card");
+            if (clickedCard) {
+              const itemKey = clickedCard.getAttribute("data-item");
+              openModal(itemKey);
+            }
+          });
+        });
+
+        // Event listener for the close button
+        modalCloseBtn.addEventListener("click", closeModal);
+
+        // Close modal when clicking outside of it
+        modalOverlay.addEventListener("click", (event) => {
+          if (event.target === modalOverlay) {
+            closeModal();
+          }
+        });
+
+        // Allow closing with the 'Escape' key
+        document.addEventListener("keydown", (event) => {
+          if (
+            event.key === "Escape" &&
+            modalOverlay.classList.contains("open")
+          ) {
+            closeModal();
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
